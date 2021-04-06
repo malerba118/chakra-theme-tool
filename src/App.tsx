@@ -14,6 +14,7 @@ import ComponentItem from "./ComponentItem";
 import manager from "./ThemeManager";
 import { observer } from "mobx-react-lite";
 import { Editor } from "./Editor";
+import { autorun } from "mobx";
 
 const CodeButton: FC<any> = ({ onClick, isOpen, ...otherProps }) => {
   return (
@@ -26,14 +27,15 @@ const CodeButton: FC<any> = ({ onClick, isOpen, ...otherProps }) => {
   );
 };
 
-// const DEFAULT_COMPONENTS: ComponentData[] = [
-//   {
-//     render: `({ size, variant }) => <Button size={size} variant={variant}>Test</Button>`,
-//     theme: `({})`,
-//     key: "Button",
-//     name: "Buttons",
-//   },
-// ];
+// save to local storage
+autorun(
+  () => {
+    localStorage.setItem("data", JSON.stringify(manager.data));
+  },
+  {
+    delay: 5000,
+  }
+);
 
 const App = observer(() => {
   const [sidebarOpen, setSidebarOpen] = useState(true);

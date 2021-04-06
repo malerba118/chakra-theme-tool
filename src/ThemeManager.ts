@@ -83,6 +83,23 @@ class ThemeManager {
     componentKey: null,
   });
 
+  constructor({ global, components }: any = {}) {
+    if (global) {
+      this.global = observable(global);
+    }
+    if (components) {
+      this.components = observable(components);
+    }
+  }
+
+  @computed
+  get data() {
+    return {
+      global: this.global,
+      components: this.components,
+    };
+  }
+
   addComponent({
     key,
     name,
@@ -149,4 +166,6 @@ class ThemeManager {
   }
 }
 
-export default new ThemeManager();
+const data = localStorage.getItem("data");
+
+export default new ThemeManager(data ? JSON.parse(data) : {});
