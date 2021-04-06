@@ -72,7 +72,7 @@ const animationVariants: any = {
 const ComponentItem: FC<ComponentItemProps> = observer(
   ({ mode, componentKey }) => {
     const component = manager.components[componentKey];
-    const theme = manager.getTheme();
+    const theme = manager.theme;
     const variants = getVariants(theme, component.key);
     const sizes = getSizes(theme, component.key);
 

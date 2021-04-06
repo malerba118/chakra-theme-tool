@@ -40,7 +40,7 @@ const App = observer(() => {
   const [components, setComponents] = useState();
 
   return (
-    <ChakraProvider theme={manager.getTheme()}>
+    <ChakraProvider>
       <MotionConfig
         transition={{ type: "spring", stiffness: 500, damping: 50 }}
       >

@@ -1,41 +1,82 @@
-import { observable } from "mobx";
+import { computed, observable } from "mobx";
 import { theme, extendTheme, ChakraTheme } from "@chakra-ui/react";
 import { ComponentData } from "./types";
 import { mapValues } from "lodash";
 import evaluate from "./evaluate";
 
 const DEFAULT_RENDERER = `({ size, variant }) => <Box size={size} variant={variant}>Hello</Box>`;
-const DEFAULT_THEME = `{}`;
+const DEFAULT_COMPONENT_THEME = `{
+  // style object for base or default style
+  baseStyle: {},
+  // styles for different sizes ("sm", "md", "lg")
+  sizes: {},
+  // styles for different visual variants ("outline", "solid")
+  variants: {},
+  // default values for 'size' and 'variant'
+  defaultProps: {
+    size: "md",
+    colorScheme: "brand"
+  },
+}`;
+const DEFAULT_GLOBAL_THEME = `{
+  colors: {
+    brand: {
+      50: '#f5e3ff',
+      100: '#d8b2ff',
+      200: '#bd80ff',
+      300: '#a34dff',
+      400: '#881bfe',
+      500: '#6f02e5',
+      600: '#5600b3',
+      700: '#3e0081',
+      800: '#25004f',
+      900: '#0e001f',
+    }
+  },
+  fonts: {
+    body: "system-ui, sans-serif",
+    heading: "Georgia, serif",
+    mono: "Menlo, monospace",
+  },
+  styles: {
+    global: {
+      a: {
+        color: "brand.500",
+        _hover: {
+          textDecoration: "underline",
+        },
+      },
+    },
+  },
+  fontSizes: {},
+  fontWeights: {},
+  lineHeights: {},
+  letterSpacings: {},
+}`;
 const DEFAULT_COMPONENTS: Record<string, ComponentData> = {
   Button: {
-    render: `({ size, variant }) => <Button size={size} variant={variant}>Test</Button>`,
-    overrides: `{}`,
+    render: `({ size, variant }) => <Button size={size} variant={variant}>Hello</Button>`,
+    overrides: DEFAULT_COMPONENT_THEME,
     key: "Button",
     name: "Buttons",
   },
-  Button2: {
-    render: `({ size, variant }) => <Button size={size} variant={variant}>Test</Button>`,
-    overrides: `{}`,
-    key: "Button",
-    name: "Buttons",
+  Checkbox: {
+    render: `({ size, variant }) => <Checkbox size={size} variant={variant} />`,
+    overrides: DEFAULT_COMPONENT_THEME,
+    key: "Checkbox",
+    name: "Checkboxes",
   },
-  Button3: {
-    render: `({ size, variant }) => <Button size={size} variant={variant}>Test</Button>`,
-    overrides: `{}`,
-    key: "Button",
-    name: "Buttons",
-  },
-  Button4: {
-    render: `({ size, variant }) => <Button size={size} variant={variant}>Test</Button>`,
-    overrides: `{}`,
-    key: "Button",
-    name: "Buttons",
+  Input: {
+    render: `({ size, variant }) => <Input size={size} variant={variant} defaultValue="input" />`,
+    overrides: DEFAULT_COMPONENT_THEME,
+    key: "Input",
+    name: "Inputs",
   },
 };
 
 class ThemeManager {
   global = observable<any>({
-    overrides: `{}`,
+    overrides: DEFAULT_GLOBAL_THEME,
   });
   components = observable<Record<string, ComponentData>>(DEFAULT_COMPONENTS);
   selected = observable<any>({
@@ -46,7 +87,7 @@ class ThemeManager {
     key,
     name,
     render = DEFAULT_RENDERER,
-    overrides = DEFAULT_THEME,
+    overrides = DEFAULT_COMPONENT_THEME,
   }: ComponentData) {}
 
   get componentKeys() {
@@ -73,8 +114,8 @@ class ThemeManager {
     this.global.overrides = overrides;
   }
 
-  getTheme(): ChakraTheme {
-    // TODO: transpile and eval these before returning theme obj
+  @computed
+  get theme(): ChakraTheme {
     const components = mapValues(this.components, (data) =>
       this.getComponentOverrides(data.key)
     );
