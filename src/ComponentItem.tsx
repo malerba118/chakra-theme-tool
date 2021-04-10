@@ -1,4 +1,4 @@
-import React, { useState, FC } from "react";
+import React, { useState, FC, useMemo } from "react";
 import {
   Accordion,
   AccordionItem,
@@ -17,6 +17,18 @@ import manager from "./ThemeManager";
 import { observer } from "mobx-react-lite";
 import { motion, Variants } from "framer-motion";
 import MotionBox from "./MotionBox";
+import evaluate from "./evaluate";
+import { ErrorBoundary } from "react-error-boundary";
+
+const ErrorFallback: FC<any> = ({ error, resetErrorBoundary }) => {
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre>{error.message}</pre>
+      <button onClick={resetErrorBoundary}>Try again</button>
+    </div>
+  );
+};
 
 interface ComponentItemProps {
   mode: "grid-item" | "list-item" | "expanded";
@@ -65,7 +77,7 @@ const animationVariants: any = {
     transform: "scale(1)",
   },
   "grid-item": {
-    transform: "scale(.5)",
+    transform: "scale(.75)",
   },
 };
 
@@ -76,62 +88,79 @@ const ComponentItem: FC<ComponentItemProps> = observer(
     const variants = getVariants(theme, component.key);
     const sizes = getSizes(theme, component.key);
 
-    const renderer = manager.getComponentRenderer(componentKey);
+    const rendererStr = manager.getRawComponentRenderer(componentKey);
+
+    const Renderer = useMemo(() => {
+      return evaluate(rendererStr);
+    }, [rendererStr]);
 
     return (
-      <ChakraProvider theme={theme}>
-        <Stack
-          style={{
-            transformOrigin: "0 0",
-            ...animationVariants[mode],
-          }}
-          p={8}
-        >
-          <Heading size="xl" pb={2}>
-            {component.name}
-          </Heading>
-          {mode === "grid-item" && (
-            <Wrap w="200%" spacing={4}>
-              {variants.map((variant) => (
-                <Card
-                  title={variant || "default"}
-                  minWidth={"180px"}
-                  alignSelf="stretch"
-                >
-                  <Box p={2}>{renderer?.({ variant })}</Box>
-                </Card>
-              ))}
-            </Wrap>
-          )}
-          {mode === "expanded" && (
-            <Accordion defaultIndex={0}>
-              {sizes.map((size) => (
-                <AccordionItem>
-                  <AccordionButton>
-                    <Heading size="md" py={2}>
-                      {size || "default"}
-                    </Heading>
-                    <AccordionIcon />
-                  </AccordionButton>
-                  <AccordionPanel py={4}>
-                    <Wrap spacing={4}>
-                      {variants.map((variant) => (
-                        <Card
-                          title={variant || "default"}
-                          minWidth={"180px"}
-                          alignSelf="stretch"
-                        >
-                          <Box p={2}>{renderer?.({ size, variant })}</Box>
-                        </Card>
-                      ))}
-                    </Wrap>
-                  </AccordionPanel>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          )}
-        </Stack>
-      </ChakraProvider>
+      <ErrorBoundary
+        FallbackComponent={ErrorFallback}
+        onReset={() => {
+          // reset the state of your app so the error doesn't happen again
+        }}
+      >
+        <ChakraProvider theme={theme}>
+          <Stack
+            style={{
+              transformOrigin: "0 0",
+              ...animationVariants[mode],
+            }}
+            p={8}
+          >
+            <Heading size="xl" pb={2}>
+              {component.name}
+            </Heading>
+            {mode === "grid-item" && (
+              <Wrap w="133.33%" spacing={4}>
+                {variants.map((variant) => (
+                  <Card
+                    title={variant || "default"}
+                    minWidth={"165px"}
+                    alignSelf="stretch"
+                  >
+                    <Box p={2}>
+                      {Renderer && <Renderer variant={variant} />}
+                    </Box>
+                  </Card>
+                ))}
+              </Wrap>
+            )}
+            {mode === "expanded" && (
+              <Accordion defaultIndex={0}>
+                {sizes.map((size) => (
+                  <AccordionItem>
+                    <AccordionButton>
+                      <Heading size="md" py={2}>
+                        {size || "default"}
+                      </Heading>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel py={4}>
+                      <Wrap spacing={4}>
+                        {variants.map((variant) => (
+                          <Card
+                            title={variant || "default"}
+                            minWidth={"165px"}
+                            alignSelf="stretch"
+                          >
+                            <Box p={2}>
+                              {Renderer && (
+                                <Renderer size={size} variant={variant} />
+                              )}
+                            </Box>
+                          </Card>
+                        ))}
+                      </Wrap>
+                    </AccordionPanel>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            )}
+          </Stack>
+        </ChakraProvider>
+      </ErrorBoundary>
     );
   }
 );

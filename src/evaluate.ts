@@ -1,16 +1,21 @@
 import * as Chakra from "@chakra-ui/react";
 import * as Babel from "@babel/standalone";
 import * as React from "react";
-
-window.React = React;
-Object.assign(window, Chakra);
+// @ts-ignore
+import safeEval from "safer-eval/lib/browser";
 
 const evaluate = (code: string) => {
+  "use strict";
   code = `(${code})`;
   try {
-    const transpiled = Babel.transform(code, { presets: ["env", "react"] })
-      .code;
-    return transpiled ? eval(transpiled) : null;
+    let transpiled = Babel.transform(code, {
+      presets: ["env", "react"],
+      sourceType: "script",
+    }).code;
+    const result = transpiled
+      ? safeEval(transpiled, { Chakra, React, window })
+      : null;
+    return result;
   } catch (err) {
     console.log(err);
     return null;

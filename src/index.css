@@ -27,3 +27,9 @@ code {
 .editor {
   height: 100%;
 }
+
+.colorpicker {
+  width: 100% !important;
+  box-shadow: none !important;
+  background: rgba(0, 30, 50, 0.05) !important;
+}

@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import "focus-visible/dist/focus-visible";
 
 ReactDOM.render(
   <React.StrictMode>

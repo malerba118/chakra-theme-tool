@@ -4,8 +4,20 @@ import { ComponentData } from "./types";
 import { mapValues } from "lodash";
 import evaluate from "./evaluate";
 
-const DEFAULT_RENDERER = `({ size, variant }) => <Box size={size} variant={variant}>Hello</Box>`;
-const DEFAULT_COMPONENT_THEME = `{
+const getDefaultRenderer = (
+  componentKey: string
+) => `// Specify what to render for each size and variant
+({ size, variant }) => {
+  const sx = Chakra.useStyleConfig('${componentKey}', { size, variant })
+
+  return (
+    <Chakra.Box sx={sx}>
+      Hello
+    </Chakra.Box>
+  )
+}`;
+const DEFAULT_COMPONENT_THEME = `// Specify theme overrides for this component
+{
   // style object for base or default style
   baseStyle: {},
   // styles for different sizes ("sm", "md", "lg")
@@ -18,7 +30,8 @@ const DEFAULT_COMPONENT_THEME = `{
     colorScheme: "brand"
   },
 }`;
-const DEFAULT_GLOBAL_THEME = `{
+const DEFAULT_GLOBAL_THEME = `// Specify global theme overrides
+{
   colors: {
     brand: {
       50: '#f5e3ff',
@@ -54,23 +67,67 @@ const DEFAULT_GLOBAL_THEME = `{
   letterSpacings: {},
 }`;
 const DEFAULT_COMPONENTS: Record<string, ComponentData> = {
+  Badge: {
+    render: `({ size, variant }) => (
+  <Chakra.Badge 
+    size={size} 
+    variant={variant} 
+  >
+    Hello
+  </Chakra.Badge>
+)`,
+    overrides: DEFAULT_COMPONENT_THEME,
+    key: "Badge",
+    name: "Badges",
+  },
   Button: {
-    render: `({ size, variant }) => <Button size={size} variant={variant}>Hello</Button>`,
+    render: `({ size, variant }) => (
+  <Chakra.Button 
+    size={size} 
+    variant={variant}
+  >
+    Hello
+  </Chakra.Button>
+)`,
     overrides: DEFAULT_COMPONENT_THEME,
     key: "Button",
     name: "Buttons",
   },
   Checkbox: {
-    render: `({ size, variant }) => <Checkbox size={size} variant={variant} />`,
+    render: `({ size, variant }) => (
+  <Chakra.Checkbox 
+    size={size} 
+    variant={variant} 
+  />
+)`,
     overrides: DEFAULT_COMPONENT_THEME,
     key: "Checkbox",
     name: "Checkboxes",
   },
   Input: {
-    render: `({ size, variant }) => <Input size={size} variant={variant} defaultValue="input" />`,
+    render: `({ size, variant }) => (
+  <Chakra.Input 
+    size={size} 
+    variant={variant} 
+    placeholder="hello..." 
+  />
+)`,
     overrides: DEFAULT_COMPONENT_THEME,
     key: "Input",
     name: "Inputs",
+  },
+  Tag: {
+    render: `({ size, variant }) => (
+  <Chakra.Tag 
+    size={size} 
+    variant={variant} 
+  >
+    Hello
+  </Chakra.Tag>
+)`,
+    overrides: DEFAULT_COMPONENT_THEME,
+    key: "Tag",
+    name: "Tags",
   },
 };
 
@@ -100,12 +157,23 @@ class ThemeManager {
     };
   }
 
-  addComponent({
+  addComponent = ({
     key,
     name,
-    render = DEFAULT_RENDERER,
+    render = getDefaultRenderer(key),
     overrides = DEFAULT_COMPONENT_THEME,
-  }: ComponentData) {}
+  }: ComponentData) => {
+    this.components[key] = {
+      key,
+      name,
+      render,
+      overrides,
+    };
+  };
+
+  removeComponent(componentKey: string) {
+    delete this.components[componentKey];
+  }
 
   get componentKeys() {
     return Object.keys(this.components);
@@ -117,8 +185,9 @@ class ThemeManager {
   getRawComponentOverrides(componentKey: string): string {
     return this.components[componentKey].overrides;
   }
-  getComponentOverrides(componentKey: string): string {
-    return evaluate(this.components[componentKey].overrides) || {};
+  getComponentOverrides(componentKey: string): any {
+    const val = evaluate(this.components[componentKey].overrides);
+    return val;
   }
 
   getGlobalOverrides() {
@@ -150,14 +219,14 @@ class ThemeManager {
   }
 
   getRawComponentRenderer(componentKey: string) {
-    return this.components[componentKey].render;
+    return this.components[componentKey]?.render || "";
   }
 
   getComponentRenderer(componentKey: string) {
     return evaluate(this.components[componentKey].render);
   }
 
-  setSelected(componentKey: string) {
+  setSelected(componentKey: string | null) {
     this.selected.componentKey = componentKey;
   }
 
