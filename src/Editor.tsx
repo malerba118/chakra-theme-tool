@@ -14,15 +14,15 @@ import debounce from "lodash/debounce";
 const debounced = {
   setRawGlobalOverrides: debounce(
     (val) => manager.setRawGlobalOverrides(val),
-    500
+    1000
   ),
   setRawComponentOverrides: debounce(
     (componentKey, val) => manager.setRawComponentOverrides(componentKey, val),
-    500
+    1000
   ),
   setRawComponentRenderer: debounce(
     (componentKey, val) => manager.setRawComponentRenderer(componentKey, val),
-    500
+    1000
   ),
 };
 
@@ -85,9 +85,9 @@ export const Editor: FC<EditorProps> = observer(() => {
                 textTransform="uppercase"
                 key={tab}
                 w="92px"
-                color={'whiteAlpha.700'}
-                marginBottom='-1px'
-                _selected={{ color: "white", borderBottom: '1px solid white' }}
+                color={"whiteAlpha.700"}
+                marginBottom="-1px"
+                _selected={{ color: "white", borderBottom: "1px solid white" }}
                 _hover={{ bg: "whiteAlpha.100" }}
                 _focus={{ boxShadow: "none" }}
               >

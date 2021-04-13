@@ -13,7 +13,7 @@ const evaluate = (code: string) => {
       sourceType: "script",
     }).code;
     const result = transpiled
-      ? safeEval(transpiled, { Chakra, React, window })
+      ? safeEval(transpiled, { ...Chakra, Chakra, React, window })
       : null;
     return result;
   } catch (err) {

@@ -8,12 +8,12 @@ const getDefaultRenderer = (
   componentKey: string
 ) => `// Specify what to render for each size and variant
 ({ size, variant }) => {
-  const sx = Chakra.useStyleConfig('${componentKey}', { size, variant })
+  const sx = useStyleConfig('${componentKey}', { size, variant })
 
   return (
-    <Chakra.Box sx={sx}>
+    <Box sx={sx}>
       Hello
-    </Chakra.Box>
+    </Box>
   )
 }`;
 const DEFAULT_COMPONENT_THEME = `// Specify theme overrides for this component
@@ -47,9 +47,9 @@ const DEFAULT_GLOBAL_THEME = `// Specify global theme overrides
     }
   },
   fonts: {
-    body: "system-ui, sans-serif",
-    heading: "Georgia, serif",
-    mono: "Menlo, monospace",
+    body: "Inconsolata, sans-serif",
+    heading: "Inconsolata, serif",
+    mono: "Inconsolata, monospace",
   },
   styles: {
     global: {
@@ -69,12 +69,12 @@ const DEFAULT_GLOBAL_THEME = `// Specify global theme overrides
 const DEFAULT_COMPONENTS: Record<string, ComponentData> = {
   Badge: {
     render: `({ size, variant }) => (
-  <Chakra.Badge 
+  <Badge 
     size={size} 
     variant={variant} 
   >
     Hello
-  </Chakra.Badge>
+  </Badge>
 )`,
     overrides: DEFAULT_COMPONENT_THEME,
     key: "Badge",
@@ -82,12 +82,12 @@ const DEFAULT_COMPONENTS: Record<string, ComponentData> = {
   },
   Button: {
     render: `({ size, variant }) => (
-  <Chakra.Button 
+  <Button 
     size={size} 
     variant={variant}
   >
     Hello
-  </Chakra.Button>
+  </Button>
 )`,
     overrides: DEFAULT_COMPONENT_THEME,
     key: "Button",
@@ -95,7 +95,7 @@ const DEFAULT_COMPONENTS: Record<string, ComponentData> = {
   },
   Checkbox: {
     render: `({ size, variant }) => (
-  <Chakra.Checkbox 
+  <Checkbox 
     size={size} 
     variant={variant} 
   />
@@ -104,9 +104,22 @@ const DEFAULT_COMPONENTS: Record<string, ComponentData> = {
     key: "Checkbox",
     name: "Checkboxes",
   },
+  Heading: {
+    render: `({ size, variant }) => (
+  <Heading 
+    size={size} 
+    variant={variant} 
+  >
+    Hello
+  </Heading>
+)`,
+    overrides: DEFAULT_COMPONENT_THEME,
+    key: "Heading",
+    name: "Headings",
+  },
   Input: {
     render: `({ size, variant }) => (
-  <Chakra.Input 
+  <Input 
     size={size} 
     variant={variant} 
     placeholder="hello..." 
@@ -118,12 +131,12 @@ const DEFAULT_COMPONENTS: Record<string, ComponentData> = {
   },
   Tag: {
     render: `({ size, variant }) => (
-  <Chakra.Tag 
+  <Tag 
     size={size} 
     variant={variant} 
   >
     Hello
-  </Chakra.Tag>
+  </Tag>
 )`,
     overrides: DEFAULT_COMPONENT_THEME,
     key: "Tag",
@@ -139,13 +152,17 @@ class ThemeManager {
   selected = observable<any>({
     componentKey: null,
   });
+  fonts = observable<string>(["Inconsolata"]);
 
-  constructor({ global, components }: any = {}) {
+  constructor({ global, components, fonts }: any = {}) {
     if (global) {
       this.global = observable(global);
     }
     if (components) {
       this.components = observable(components);
+    }
+    if (fonts) {
+      this.fonts = observable(fonts);
     }
   }
 
@@ -154,6 +171,7 @@ class ThemeManager {
     return {
       global: this.global,
       components: this.components,
+      fonts: this.fonts,
     };
   }
 
@@ -232,6 +250,18 @@ class ThemeManager {
 
   getSelected() {
     return this.selected.componentKey;
+  }
+
+  selectFont(font: string) {
+    this.fonts.push(font);
+  }
+
+  unselectFont(font: string) {
+    this.fonts.splice(this.fonts.indexOf(font), 1);
+  }
+
+  getSelectedFonts() {
+    return this.fonts;
   }
 }
 

@@ -17,9 +17,11 @@ import {
   IoMdCode as CodeIcon,
   IoMdClose as CloseIcon,
   IoMdColorPalette as ColorIcon,
+  IoMdAddCircleOutline as AddIcon,
 } from "react-icons/io";
+import { BiFontFamily as FontIcon } from "react-icons/bi";
 import "./App.css";
-import { MotionConfig } from "framer-motion";
+import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import MotionBox from "./MotionBox";
 import ComponentItem from "./ComponentItem";
 import manager from "./ThemeManager";
@@ -30,13 +32,8 @@ import PaletteModal from "./PaletteModal";
 import AddComponentModal from "./AddComponentModal";
 import { ErrorBoundary } from "react-error-boundary";
 
-const theme = extendTheme({
-  fonts: {
-    body: "'Inconsolata', monospace",
-    heading: "'Inconsolata', serif",
-    mono: "'Inconsolata', monospace",
-  },
-});
+import * as fonts from "./fonts";
+import FontLoaderModal from "./FontLoaderModal";
 
 const ErrorFallback: FC<any> = ({ error, resetErrorBoundary }) => {
   return (
@@ -48,9 +45,37 @@ const ErrorFallback: FC<any> = ({ error, resetErrorBoundary }) => {
   );
 };
 
+const variants = {
+  menu: {
+    open: {
+      transition: {
+        staggerChildren: 0.1,
+        staggerDirection: 1,
+      },
+    },
+    closed: {
+      transition: {
+        staggerChildren: 0.1,
+        staggerDirection: -1,
+      },
+    },
+  },
+  menuItem: {
+    open: {
+      opacity: 1,
+      x: 0,
+    },
+    closed: {
+      opacity: 0,
+      x: 36,
+    },
+  },
+};
+
 const CodeMenu: FC<any> = ({
   onClick,
   onColorsClick,
+  onFontsClick,
   isOpen,
   ...otherProps
 }) => {
@@ -64,18 +89,44 @@ const CodeMenu: FC<any> = ({
         variant="outline"
         icon={isOpen ? <CloseIcon /> : <CodeIcon />}
       />
-      {isOpen && (
-        <Stack pt={2} spacing={3}>
-          <IconButton
-            variant="outline"
-            colorScheme="whiteAlpha"
-            bg="#212121"
-            onClick={onColorsClick}
-            aria-label="colors"
-            icon={<ColorIcon />}
-          />
-        </Stack>
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            variants={variants.menu}
+            style={{ paddingTop: "6px" }}
+            initial="closed"
+            animate={"open"}
+            exit={"closed"}
+          >
+            <motion.div
+              variants={variants.menuItem}
+              style={{ padding: "6px 0" }}
+            >
+              <IconButton
+                variant="outline"
+                colorScheme="whiteAlpha"
+                bg="#212121"
+                onClick={onColorsClick}
+                aria-label="colors"
+                icon={<ColorIcon />}
+              />
+            </motion.div>
+            <motion.div
+              variants={variants.menuItem}
+              style={{ padding: "6px 0" }}
+            >
+              <IconButton
+                variant="outline"
+                colorScheme="whiteAlpha"
+                bg="#212121"
+                onClick={onFontsClick}
+                aria-label="fonts"
+                icon={<FontIcon />}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Stack>
   );
 };
@@ -86,20 +137,20 @@ autorun(
     localStorage.setItem("data", JSON.stringify(manager.data));
   },
   {
-    delay: 5000,
+    delay: 3000,
   }
 );
 
 const App = observer(() => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [components, setComponents] = useState();
   const modals = {
     color: useDisclosure(),
     component: useDisclosure(),
+    font: useDisclosure(),
   };
 
   return (
-    <ChakraProvider theme={theme}>
+    <ChakraProvider>
       <MotionConfig
         transition={{ type: "spring", stiffness: 500, damping: 50 }}
       >
@@ -161,8 +212,11 @@ const App = observer(() => {
                   _hover={{ transform: "scale(1.015)", boxShadow: "md" }}
                   boxShadow={"sm"}
                 >
-                  <Center h="100%">
-                    <Text>Add a Component</Text>
+                  <Center flexDirection="column" h="100%" fontSize="xl">
+                    <Text fontSize="md" fontWeight="bold">
+                      Add a Component
+                    </Text>
+                    <AddIcon />
                   </Center>
                 </Box>
               </SimpleGrid>
@@ -205,14 +259,22 @@ const App = observer(() => {
           isOpen={modals.color.isOpen}
           onClose={modals.color.onClose}
         />
+        <FontLoaderModal
+          isOpen={modals.font.isOpen}
+          onClose={modals.font.onClose}
+        />
         <AddComponentModal
           isOpen={modals.component.isOpen}
           onClose={modals.component.onClose}
-          onSubmit={manager.addComponent}
+          onSubmit={(data: any) => {
+            manager.addComponent(data);
+            modals.component.onClose();
+          }}
         />
         <CodeMenu
           onClick={() => setSidebarOpen((p) => !p)}
           onColorsClick={modals.color.onOpen}
+          onFontsClick={modals.font.onOpen}
           isOpen={sidebarOpen}
           pos="fixed"
           top={"12px"}

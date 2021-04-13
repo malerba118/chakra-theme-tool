@@ -1,5 +1,6 @@
 import React, { FC, useState, useRef } from "react";
 import Hue from "react-color/lib/components/hue/Hue";
+import manager from "./ThemeManager";
 import {
   Modal,
   ModalOverlay,
@@ -19,13 +20,16 @@ import {
   FormLabel,
   FormControl,
 } from "@chakra-ui/react";
+import { observer } from "mobx-react-lite";
 
-const AddComponentModal: FC<any> = ({ isOpen, onClose, onSubmit }) => {
+const AddComponentModal: FC<any> = observer(({ isOpen, onClose, onSubmit }) => {
   const nameEl = useRef<HTMLInputElement>(null);
   const [name, setName] = useState("");
   const [key, setKey] = useState("");
 
-  const isValid = !!name && !!key && !key.includes(" ");
+  const keyAlreadyExists = !!manager.components[key];
+
+  const isValid = !!name && !!key && !key.includes(" ") && !keyAlreadyExists;
 
   return (
     <Modal
@@ -77,6 +81,6 @@ const AddComponentModal: FC<any> = ({ isOpen, onClose, onSubmit }) => {
       </ModalContent>
     </Modal>
   );
-};
+});
 
 export default AddComponentModal;

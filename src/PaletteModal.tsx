@@ -49,13 +49,19 @@ const PaletteModal: FC<any> = ({ isOpen, onClose }) => {
         <ModalCloseButton />
         <ModalBody>
           <Stack spacing={5}>
-            <ChromePicker
-              className="colorpicker"
-              color={hex}
-              onChange={({ hex }) => setHex(hex)}
-              disableAlpha
-            />
-            <Flex>
+            <Box
+              onDragStart={(e) => e.preventDefault()}
+              borderRadius="md"
+              overflow="hidden"
+            >
+              <ChromePicker
+                className="colorpicker"
+                color={hex}
+                onChange={({ hex }) => setHex(hex)}
+                disableAlpha
+              />
+            </Box>
+            <Flex borderRadius="lg" overflow="hidden">
               {Object.keys(scale).map((colorKey) => (
                 <Box flex={1}>
                   <Color key={colorKey} color={scale[colorKey]} />
@@ -68,7 +74,7 @@ const PaletteModal: FC<any> = ({ isOpen, onClose }) => {
           <Button colorScheme="blue" mr={3} onClick={onCopy}>
             {hasCopied ? "Copied!" : "Copy"}
           </Button>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={onClose}>Close</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
