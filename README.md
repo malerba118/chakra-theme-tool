@@ -1,3 +1,9 @@
+# Chakra Theme Tool
+
+This is a tool to help build chakra-ui themes. It's designed to let you see all of your themed components in one place and to let you iterate on your theme in a holistic way. Chakra theme tool lets you easily experiment with global and component-level styles side-by-side.
+
+Check it out at [https://malerba118.github.io/chakra-theme-tool/](https://malerba118.github.io/chakra-theme-tool/)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
