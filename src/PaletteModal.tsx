@@ -14,21 +14,57 @@ import {
   Stack,
   Text,
   useClipboard,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import * as chroma from "chroma-js";
 import { ChromePicker } from "react-color";
+import _ from "lodash";
 
 const Color: FC<any> = ({ color }) => {
   return <Flex w="100%" h="48px" bg={color}></Flex>;
 };
 
-const PaletteModal: FC<any> = ({ isOpen, onClose }) => {
-  const [hex, setHex] = useState("#ff0000");
+const SATURATIONS = [0.32, 0.16, 0.08, 0.04, 0, 0, 0.04, 0.08, 0.16, 0.32];
+const LIGHTNESSES = [
+  0.95,
+  0.85,
+  0.75,
+  0.65,
+  0.55,
+  0.45,
+  0.35,
+  0.25,
+  0.15,
+  0.05,
+];
 
-  const colors = chroma
-    .scale([chroma.hex(hex).luminance(0.8), chroma.hex(hex).luminance(0.25)])
-    .mode("lab")
-    .colors(10);
+const PaletteModal: FC<any> = ({ isOpen, onClose }) => {
+  const [hex, setHex] = useState("#A600FF");
+
+  const styles = useColorModeValue(
+    {
+      bg: "blackAlpha.100",
+    },
+    {
+      bg: "whiteAlpha.100",
+    }
+  );
+
+  const selectedColor = chroma.hex(hex);
+
+  const targetLightness = _.minBy(LIGHTNESSES, (lightness) =>
+    Math.abs(lightness - selectedColor.get("hsl.l"))
+  ) as number;
+
+  const colorIndex = LIGHTNESSES.indexOf(targetLightness);
+
+  const colors = LIGHTNESSES.map((lightness, i) => {
+    const color = selectedColor.set("hsl.l", lightness);
+    const delta = SATURATIONS[i] - SATURATIONS[colorIndex];
+    return delta >= 0
+      ? color.saturate(delta).hex()
+      : color.desaturate(-delta).hex();
+  });
 
   const scale = colors.reduce((obj, color, index) => {
     if (index === 0) {
@@ -53,6 +89,8 @@ const PaletteModal: FC<any> = ({ isOpen, onClose }) => {
               onDragStart={(e) => e.preventDefault()}
               borderRadius="md"
               overflow="hidden"
+              border="none"
+              bg={styles.bg}
             >
               <ChromePicker
                 className="colorpicker"
@@ -71,10 +109,12 @@ const PaletteModal: FC<any> = ({ isOpen, onClose }) => {
           </Stack>
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={onCopy}>
+          <Button colorScheme="brand" mr={3} onClick={onCopy}>
             {hasCopied ? "Copied!" : "Copy"}
           </Button>
-          <Button onClick={onClose}>Close</Button>
+          <Button colorScheme="gray" onClick={onClose}>
+            Close
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

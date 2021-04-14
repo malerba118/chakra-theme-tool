@@ -11,6 +11,8 @@ import {
   AccordionIcon,
   AccordionPanel,
   ChakraProvider,
+  useColorModeValue,
+  useColorModePreference,
 } from "@chakra-ui/react";
 import { ComponentData } from "./types";
 import manager from "./ThemeManager";
@@ -101,65 +103,61 @@ const ComponentItem: FC<ComponentItemProps> = observer(
           // reset the state of your app so the error doesn't happen again
         }}
       >
-        <ChakraProvider theme={theme}>
-          <Stack
-            style={{
-              transformOrigin: "0 0",
-              ...animationVariants[mode],
-            }}
-            p={8}
-          >
-            <Heading size="xl" pb={2}>
-              {component.name}
-            </Heading>
-            {mode === "grid-item" && (
-              <Wrap w="133.33%" spacing={4}>
-                {variants.map((variant) => (
-                  <Card
-                    title={variant || "default"}
-                    minWidth={"165px"}
-                    alignSelf="stretch"
-                  >
-                    <Box p={2}>
-                      {Renderer && <Renderer variant={variant} />}
-                    </Box>
-                  </Card>
-                ))}
-              </Wrap>
-            )}
-            {mode === "expanded" && (
-              <Accordion defaultIndex={0}>
-                {sizes.map((size) => (
-                  <AccordionItem>
-                    <AccordionButton>
-                      <Heading size="md" py={2}>
-                        {size || "default"}
-                      </Heading>
-                      <AccordionIcon />
-                    </AccordionButton>
-                    <AccordionPanel py={4}>
-                      <Wrap spacing={4}>
-                        {variants.map((variant) => (
-                          <Card
-                            title={variant || "default"}
-                            minWidth={"165px"}
-                            alignSelf="stretch"
-                          >
-                            <Box p={2}>
-                              {Renderer && (
-                                <Renderer size={size} variant={variant} />
-                              )}
-                            </Box>
-                          </Card>
-                        ))}
-                      </Wrap>
-                    </AccordionPanel>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            )}
-          </Stack>
-        </ChakraProvider>
+        <Stack
+          style={{
+            transformOrigin: "0 0",
+            ...animationVariants[mode],
+          }}
+          p={8}
+        >
+          <Heading size="xl" pb={2}>
+            {component.name}
+          </Heading>
+          {mode === "grid-item" && (
+            <Wrap w="133.33%" spacing={4}>
+              {variants.map((variant) => (
+                <Card
+                  title={variant || "default"}
+                  minWidth={"165px"}
+                  alignSelf="stretch"
+                >
+                  <Box p={2}>{Renderer && <Renderer variant={variant} />}</Box>
+                </Card>
+              ))}
+            </Wrap>
+          )}
+          {mode === "expanded" && (
+            <Accordion defaultIndex={0}>
+              {sizes.map((size) => (
+                <AccordionItem>
+                  <AccordionButton>
+                    <Heading size="md" py={2}>
+                      {size || "default"}
+                    </Heading>
+                    <AccordionIcon />
+                  </AccordionButton>
+                  <AccordionPanel py={4}>
+                    <Wrap spacing={4}>
+                      {variants.map((variant) => (
+                        <Card
+                          title={variant || "default"}
+                          minWidth={"165px"}
+                          alignSelf="stretch"
+                        >
+                          <Box p={2}>
+                            {Renderer && (
+                              <Renderer size={size} variant={variant} />
+                            )}
+                          </Box>
+                        </Card>
+                      ))}
+                    </Wrap>
+                  </AccordionPanel>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          )}
+        </Stack>
       </ErrorBoundary>
     );
   }
@@ -168,9 +166,25 @@ const ComponentItem: FC<ComponentItemProps> = observer(
 export default ComponentItem;
 
 const Card: FC<any> = ({ title, children, ...otherProps }) => {
+  const styles = useColorModeValue(
+    {
+      borderColor: "blackAlpha.400",
+      bg: "white",
+    },
+    {
+      borderColor: "whiteAlpha.400",
+      bg: "gray.700",
+    }
+  );
+
   return (
-    <Box rounded="lg" border="1px solid" borderColor="gray.200" {...otherProps}>
-      <Box p={2} borderBottom="1px solid" borderColor="gray.200">
+    <Box
+      rounded="lg"
+      border="1px solid"
+      borderColor={styles.borderColor}
+      {...otherProps}
+    >
+      <Box p={2} borderBottom="1px solid" borderColor={styles.borderColor}>
         <Heading size="sm">{title}</Heading>
       </Box>
       <Box>{children}</Box>

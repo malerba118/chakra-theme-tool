@@ -3,6 +3,8 @@ import { theme, extendTheme, ChakraTheme } from "@chakra-ui/react";
 import { ComponentData } from "./types";
 import { mapValues } from "lodash";
 import evaluate from "./evaluate";
+// @ts-ignore
+import { stringify } from "javascript-stringify";
 
 const getDefaultRenderer = (
   componentKey: string
@@ -24,7 +26,7 @@ const DEFAULT_COMPONENT_THEME = `// Specify theme overrides for this component
   sizes: {},
   // styles for different visual variants ("outline", "solid")
   variants: {},
-  // default values for 'size' and 'variant'
+  // override default props on this component
   defaultProps: {
     size: "md",
     colorScheme: "brand"
@@ -44,6 +46,18 @@ const DEFAULT_GLOBAL_THEME = `// Specify global theme overrides
       700: '#3e0081',
       800: '#25004f',
       900: '#0e001f',
+    },
+     gray: {
+      50: "#f1f3fb",
+      100: "#d3d5dc",
+      200: "#b6b8be",
+      300: "#9a9ba1",
+      400: "#7f8084",
+      500: "#656669",
+      600: "#4c4c4f",
+      700: "#343536",
+      800: "#1e1e1f",
+      900: "#030304"
     }
   },
   fonts: {
@@ -52,21 +66,34 @@ const DEFAULT_GLOBAL_THEME = `// Specify global theme overrides
     mono: "Inconsolata, monospace",
   },
   styles: {
-    global: {
-      a: {
-        color: "brand.500",
-        _hover: {
-          textDecoration: "underline",
-        },
+    global: ({ colorMode }) => ({
+      body: {
+        bg: colorMode === "dark" ? "gray.800" : "gray.50"    
       },
-    },
+      _focusVisible: {
+        boxShadow: "0 0 0 3px #d8b2ff !important"
+      }
+    }),
   },
   fontSizes: {},
   fontWeights: {},
   lineHeights: {},
   letterSpacings: {},
 }`;
+
 const DEFAULT_COMPONENTS: Record<string, ComponentData> = {
+  Alert: {
+    render: `({ size, variant }) => (
+  <Alert size={size} variant={variant} colorScheme="brand">
+    <AlertIcon />
+    <AlertTitle mr={2}>Hello!</AlertTitle>
+    <AlertDescription>Just saying hi.</AlertDescription>
+  </Alert>
+)`,
+    overrides: DEFAULT_COMPONENT_THEME,
+    key: "Alert",
+    name: "Alerts",
+  },
   Badge: {
     render: `({ size, variant }) => (
   <Badge 
@@ -128,6 +155,47 @@ const DEFAULT_COMPONENTS: Record<string, ComponentData> = {
     overrides: DEFAULT_COMPONENT_THEME,
     key: "Input",
     name: "Inputs",
+  },
+  Spinner: {
+    render: `({ size, variant }) => (
+  <Spinner
+    size={size}
+    variant={variant}
+    thickness="4px"
+    speed="0.65s"
+  />
+)`,
+    overrides: `// Specify theme overrides for this component
+{
+  // style object for base or default style
+  baseStyle: {
+    color: "brand.300"
+  },
+  // styles for different sizes ("sm", "md", "lg")
+  sizes: {},
+  // styles for different visual variants ("outline", "solid")
+  variants: {},
+  // override default props on this component
+  defaultProps: {
+    size: "md",
+  },
+}`,
+    key: "Spinner",
+    name: "Spinners",
+  },
+  Tabs: {
+    render: `({ size, variant }) => (
+  <Tabs size={size} variant={variant}>
+    <TabList>
+      <Tab>One</Tab>
+      <Tab>Two</Tab>
+      <Tab>Three</Tab>
+    </TabList>
+  </Tabs>
+)`,
+    overrides: DEFAULT_COMPONENT_THEME,
+    key: "Tabs",
+    name: "Tabs",
   },
   Tag: {
     render: `({ size, variant }) => (
@@ -230,6 +298,24 @@ class ThemeManager {
       },
       theme
     );
+  }
+
+  @computed
+  get themeStr(): string {
+    const components = mapValues(this.components, (data) =>
+      this.getComponentOverrides(data.key)
+    );
+    const obj = {
+      ...this.getGlobalOverrides(),
+      components,
+    };
+    let result = "";
+    try {
+      result = "export const theme = " + stringify(obj, null, 2) || "";
+    } catch (err) {
+      console.error("Unable to export theme file", err);
+    }
+    return result;
   }
 
   setRawComponentRenderer(componentKey: string, renderer: string) {

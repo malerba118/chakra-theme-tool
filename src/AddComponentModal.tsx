@@ -68,14 +68,16 @@ const AddComponentModal: FC<any> = observer(({ isOpen, onClose, onSubmit }) => {
           <ModalFooter>
             <Button
               type="submit"
-              colorScheme="blue"
+              colorScheme="brand"
               mr={3}
               onClick={() => onSubmit({ name, key })}
               disabled={!isValid}
             >
               Add Component
             </Button>
-            <Button onClick={onClose}>Cancel</Button>
+            <Button colorScheme="gray" onClick={onClose}>
+              Cancel
+            </Button>
           </ModalFooter>
         </form>
       </ModalContent>

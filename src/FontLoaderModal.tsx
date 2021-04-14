@@ -124,10 +124,12 @@ const FontLoaderModal: FC<any> = observer(({ isOpen, onClose, onSubmit }) => {
           </Stack>
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={onCopy}>
+          <Button colorScheme="brand" mr={3} onClick={onCopy}>
             {hasCopied ? "Copied!" : "Copy"}
           </Button>
-          <Button onClick={onClose}>Close</Button>
+          <Button colorScheme="gray" onClick={onClose}>
+            Close
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

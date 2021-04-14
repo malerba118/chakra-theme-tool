@@ -67,7 +67,6 @@ export const Editor: FC<EditorProps> = observer(() => {
         h="64px"
         bg="#212121"
         borderBottom="1px solid"
-        borderLeft="1px solid"
         borderColor="whiteAlpha.200"
       >
         <Tabs

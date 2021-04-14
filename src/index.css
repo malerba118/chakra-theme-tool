@@ -31,5 +31,5 @@ code {
 .colorpicker {
   width: 100% !important;
   box-shadow: none !important;
-  background: #edf2f6 !important;
+  background: transparent !important;
 }
