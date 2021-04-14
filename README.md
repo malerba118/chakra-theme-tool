@@ -4,6 +4,8 @@ This is a tool to help build chakra-ui themes. It's designed to let you see all 
 
 Check it out at [https://malerba118.github.io/chakra-theme-tool/](https://malerba118.github.io/chakra-theme-tool/)
 
+![chakra-theme-tool](https://user-images.githubusercontent.com/5760059/114793787-673a1d00-9d48-11eb-9c93-2d5ce9dbf083.gif)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
