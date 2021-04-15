@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/chakra-theme-tool/static/css/main.ac6ef19b.chunk.css",
+    "main.css": "/chakra-theme-tool/static/css/main.03cacf08.chunk.css",
     "main.js": "/chakra-theme-tool/static/js/main.f5cc3371.chunk.js",
     "main.js.map": "/chakra-theme-tool/static/js/main.f5cc3371.chunk.js.map",
     "runtime-main.js": "/chakra-theme-tool/static/js/runtime-main.8c1cd3d5.js",
@@ -12,14 +12,14 @@
     "static/js/3.921cd376.chunk.js.map": "/chakra-theme-tool/static/js/3.921cd376.chunk.js.map",
     "index.html": "/chakra-theme-tool/index.html",
     "static/css/2.30810337.chunk.css.map": "/chakra-theme-tool/static/css/2.30810337.chunk.css.map",
-    "static/css/main.ac6ef19b.chunk.css.map": "/chakra-theme-tool/static/css/main.ac6ef19b.chunk.css.map",
+    "static/css/main.03cacf08.chunk.css.map": "/chakra-theme-tool/static/css/main.03cacf08.chunk.css.map",
     "static/js/2.2acff9d9.chunk.js.LICENSE.txt": "/chakra-theme-tool/static/js/2.2acff9d9.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.8c1cd3d5.js",
     "static/css/2.30810337.chunk.css",
     "static/js/2.2acff9d9.chunk.js",
-    "static/css/main.ac6ef19b.chunk.css",
+    "static/css/main.03cacf08.chunk.css",
     "static/js/main.f5cc3371.chunk.js"
   ]
 }
